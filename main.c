@@ -103,16 +103,20 @@ void ReadFile(FILE* in_file){
         sscanf(&testing_input[number_of_digits-2], "%c", &checksum[0]);
         sscanf(&testing_input[number_of_digits-1], "%c", &checksum[1]);
         printf("CHECKSUM: %c%c\n", checksum[0], checksum[1]);
-        unsigned int sum =0;
+        unsigned short sum =0;
         unsigned int loop_iters = length+1;
-        unsigned int value1 = 0;
+        unsigned int value1 ;
         unsigned int value2 = 0;
-        for (int i = 0; i<data_length; i=i+2){
-            sscanf(&testing_input[2+i]  , "%02x", &value1);
-           // sscanf(&testing_input[2+i+1]  , "%2x", &value2);
-            sum = sum +value1;
+        int values_assigned;
+        for (int i = 2; i<(length+8); i=i+2){
+            values_assigned = sscanf(&testing_input[i], "%2hhx", &value1);
+            printf("Value 1: %02x\n", value1);
+            sum += value1;
+            printf("Sum: %02x\n", sum);
+            printf("Values Assigned: %d\n", values_assigned);
+            value1 =0;
         }
-        printf(" SUM %02x%02x\n ", sum);
+        printf(" FINAL SUM %02x\n ", sum);
 
     }
 
@@ -122,7 +126,7 @@ int main(int argc, char *argv[]){
     const char *file_name = "file_name";
     FILE * in_file; 
     //error_flag = fopen_s(&in_file, argv[1], "rb");
-    error_flag = fopen_s(&in_file, "ArrayInit.xme", "r");
+    error_flag = fopen_s(&in_file, "teter.xme", "r");
     ReadFile(in_file);
 
     fclose(in_file);
