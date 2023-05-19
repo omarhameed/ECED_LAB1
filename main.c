@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
+
 
 
 
@@ -14,26 +16,38 @@ void ReadFile(FILE* in_file){
         else if (testing_input[1] != '0' && testing_input[1] !='1'&& testing_input[1] !='9'){
             printf("ERROR: %s IS Not a supported S-recored only S0, S1, S9\n", testing_input);
         }
+
+
+
         // s-record valid 
         printf("%s", testing_input);
-        
-        
+
         // s1| 2 byte length | 4byte adress | data  | checksum 
         int length; 
         int address_low;
         int address_high;
         sscanf(&testing_input[2], "%2x", &length);
-        printf(" Length: %2x \n", length);
 
         //char program_name[length -4-2];
         int data_length = (length*2) -6;
+        unsigned int sum =0;
+        unsigned int value1 ;
+        int values_assigned;
+        for (int i = 2; i<(length*2)+4; i =i+2){
+            values_assigned = sscanf(&testing_input[i], "%2x", &value1);
+            sum += value1;
+           // value1 = 0;
+        }
+
+            if (sum == 255){
+                printf("Check Sum Valid\n");
+            }else if (sum != 255 ){
+                printf("Error: Check Sum Error detected file corrupted\n");
+                printf("  ========================CHECKSUM %02x\n ", sum);
+                //exit(0);
+            }
 
 
-
-        // Not Correct 
-        sscanf(&testing_input[4], "%2x %2x", &address_high, &address_low);
-        unsigned int address = ((unsigned int)address_high << 8) | address_low;
-        printf(" Adress: %2x %2x \n", address);
 
       /*for(int i=0; i<length; i++){
             unsigned int data[1];
@@ -51,6 +65,7 @@ void ReadFile(FILE* in_file){
                 sscanf(&testing_input[8+i]  , "%2x", &ascii_char[i]);
                 printf("%c", ascii_char[i]);
             }
+            
             printf("\n");
             free(ascii_char);
 
@@ -61,9 +76,7 @@ void ReadFile(FILE* in_file){
             data bytes are stored in contiguous locations. If there is already a value in a memory location, it must
             be overwritten.
             */
-
             printf("S1 RECORED DETECTED: \n");
-
             char data[data_length];
             unsigned int address_lo;
             unsigned int address_hi;
@@ -72,9 +85,6 @@ void ReadFile(FILE* in_file){
             unsigned int address = address_hi << 8 | address_lo;
             printf("Address: %04x\n", address);
             //printf("\n");
-
-
-
 
         }
         else if (testing_input[1] == '9'){
@@ -102,22 +112,8 @@ void ReadFile(FILE* in_file){
         //printf("checksum size %i", sizeof(checksum));
         sscanf(&testing_input[number_of_digits-2], "%c", &checksum[0]);
         sscanf(&testing_input[number_of_digits-1], "%c", &checksum[1]);
-        printf("CHECKSUM: %c%c\n", checksum[0], checksum[1]);
-        unsigned short sum =0;
-        unsigned int loop_iters = length+1;
-        unsigned int value1 ;
-        unsigned int value2 = 0;
-        int values_assigned;
-        for (int i = 2; i<(length+8); i=i+2){
-            values_assigned = sscanf(&testing_input[i], "%2hhx", &value1);
-            printf("Value 1: %02x\n", value1);
-            sum += value1;
-            printf("Sum: %02x\n", sum);
-            printf("Values Assigned: %d\n", values_assigned);
-            value1 =0;
-        }
-        printf(" FINAL SUM %02x\n ", sum);
-
+        //printf("CHECKSUM: %c%c\n", checksum[0], checksum[1]);
+        
     }
 
 }
@@ -126,7 +122,7 @@ int main(int argc, char *argv[]){
     const char *file_name = "file_name";
     FILE * in_file; 
     //error_flag = fopen_s(&in_file, argv[1], "rb");
-    error_flag = fopen_s(&in_file, "teter.xme", "r");
+    error_flag = fopen_s(&in_file, "BitCount1.xme", "r");
     ReadFile(in_file);
 
     fclose(in_file);
